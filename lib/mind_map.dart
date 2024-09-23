@@ -7,15 +7,16 @@ import 'package:flutter/rendering.dart';
 
 /// A Calculator.
 class MindMap extends MultiChildRenderObjectWidget {
-  const MindMap({
-    Key? key,
-    required List<Widget> children,
-    this.dotColor = Colors.purple,
-    this.lineColor = Colors.black,
-    this.padding = const EdgeInsets.only(left: 50, right: 10),
-    this.dotRadius = 8,
-    this.componentWith = 50,
-  }) : super(key: key, children: children);
+  const MindMap(
+      {Key? key,
+      required List<Widget> children,
+      this.dotColor = Colors.purple,
+      this.lineColor = Colors.black,
+      this.padding = const EdgeInsets.only(left: 50, right: 10),
+      this.dotRadius = 8,
+      this.componentWith = 50,
+      required this.dotPath})
+      : super(key: key, children: children);
 
   final Color dotColor;
 
@@ -27,18 +28,19 @@ class MindMap extends MultiChildRenderObjectWidget {
 
   final double componentWith;
 
-  @override
-  RenderObject createRenderObject(BuildContext context) =>
-      RenderBranchComponent(
-          dotColor, lineColor, padding, dotRadius, componentWith);
+  final Path dotPath;
 
   @override
-  void updateRenderObject(
-      BuildContext context, covariant RenderObject renderObject) {
+  RenderObject createRenderObject(BuildContext context) =>
+      RenderBranchComponent(dotColor, lineColor, padding, dotRadius, componentWith, dotPath);
+
+  @override
+  void updateRenderObject(BuildContext context, covariant RenderObject renderObject) {
     (renderObject as RenderBranchComponent).dotColor = dotColor;
     renderObject.lineColor = lineColor;
     renderObject.padding = padding;
     renderObject.dotRadius = dotRadius;
+    renderObject.dotPath = dotPath;
   }
 }
 
@@ -47,7 +49,7 @@ class BranchComponentParentData extends ContainerBoxParentData<RenderBox> {}
 // const double childPadding = 50;
 // const double dotRadius = 6;
 const double graphPadding = 10;
-const double graphRadius = 8;
+// const double graphRadius = 8;
 
 class RenderBranchComponent extends RenderBox
     with
@@ -59,6 +61,7 @@ class RenderBranchComponent extends RenderBox
     this.padding,
     this.dotRadius,
     this.componentWith,
+    this.dotPath,
   );
 
   late Color dotColor;
@@ -71,6 +74,8 @@ class RenderBranchComponent extends RenderBox
 
   late double componentWith;
 
+  late Path dotPath;
+
   @override
   void setupParentData(covariant RenderObject child) {
     if (child.parentData is! BranchComponentParentData) {
@@ -79,20 +84,17 @@ class RenderBranchComponent extends RenderBox
   }
 
   double calculatorMaxWidth = 0;
-
   @override
   void performLayout() {
     double height = 0;
-    final deflatedConstraints =
-        constraints.deflate(EdgeInsets.only(left: padding.left));
+    final deflatedConstraints = constraints.deflate(EdgeInsets.only(left: padding.left));
 
     for (var child = firstChild; child != null; child = childAfter(child)) {
       // var childContrainsts = deflatedConstraints.copyWith(
       //   maxWidth: child.size.width
       // );
       child.layout(deflatedConstraints, parentUsesSize: true);
-      (child.parentData as BoxParentData).offset =
-          Offset(componentWith + padding.right, height);
+      (child.parentData as BoxParentData).offset = Offset(componentWith + padding.right, height);
       height += child.size.height;
       var widthChildItem = child.size.width;
       // estimateWidth
@@ -133,10 +135,9 @@ class RenderBranchComponent extends RenderBox
     double maxHeight = 0;
 
     for (var child = firstChild; child != null; child = childAfter(child)) {
-      final BranchComponentParentData childParentData =
-          child.parentData! as BranchComponentParentData;
-      var offset0 = Offset(childParentData.offset.dx + offset.dx,
-          childParentData.offset.dy + offset.dy);
+      final BranchComponentParentData childParentData = child.parentData! as BranchComponentParentData;
+      var offset0 = Offset(dotPath.getBounds().width/2+ childParentData.offset.dx + offset.dx, childParentData.offset
+          .dy + offset.dy);
       context.paintChild(child, offset0);
 
       final centerY = y + child.size.height / 2;
@@ -145,7 +146,7 @@ class RenderBranchComponent extends RenderBox
       maxHeight = y + child.size.height;
 
       /// old is grapRadius
-      var side = graphRadius * 2;
+      var side =  dotPath.getBounds().width* 2;
 
       if (childNumber == 0) {
         // first child
@@ -154,8 +155,7 @@ class RenderBranchComponent extends RenderBox
       } else if (childNumber == childCount - 1) {
         // last child
         end = dotCenter;
-        rect2 =
-            Rect.fromLTWH(graphPadding + offset.dx, centerY - side, side, side);
+        rect2 = Rect.fromLTWH(graphPadding + offset.dx, centerY - side, side, side);
       } else {
         // middle child
         lines
@@ -163,7 +163,7 @@ class RenderBranchComponent extends RenderBox
           ..lineTo(dotCenter.dx, dotCenter.dy);
       }
 
-      dots.addOval(Rect.fromCircle(center: dotCenter, radius: dotRadius));
+      dots.addPath(dotPath, dotCenter);
 
       y += child.size.height;
       childNumber++;
