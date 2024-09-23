@@ -1,5 +1,6 @@
 # Introduction
 Mind map is a library that helps users create mind trees
+This package is forked from the mind_map library and has been developed with additional features.
  
  
 # Demo
