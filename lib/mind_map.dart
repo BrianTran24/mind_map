@@ -84,6 +84,7 @@ class RenderBranchComponent extends RenderBox
   }
 
   double calculatorMaxWidth = 0;
+
   @override
   void performLayout() {
     double height = 0;
@@ -103,7 +104,7 @@ class RenderBranchComponent extends RenderBox
       }
     }
 
-    size = Size(calculatorMaxWidth, height);
+    size = Size(calculatorMaxWidth+100, height);
   }
 
   @override
