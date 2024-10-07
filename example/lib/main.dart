@@ -57,7 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
               MindMap(
                 padding: const EdgeInsets.only(left: 50),
                 dotRadius: 4,
-                dotPath: _getDotPath(),
                 children: [
                   Row(
                     children: [
@@ -75,7 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       MindMap(
                         dotRadius: 4,
-                        dotPath: _getDotPath(),
                         children: [
                           Container(
                             decoration: BoxDecoration(
@@ -113,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     .copyWith(right: 0),
                                 child: const Text('Component 4'),
                               ),
-                              MindMap(dotRadius: 4, dotPath: _getDotPath(),
+                              MindMap(dotRadius: 4,
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
@@ -186,7 +184,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       MindMap(
                         dotRadius: 4,
-                        dotPath: _getDotPath(),
                         children: [
                           Container(
                             decoration: BoxDecoration(
@@ -254,9 +251,5 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-  }
-
-  Path _getDotPath() {
-    return Path()..addOval(Rect.fromCircle(center: Offset.zero, radius: 8));
   }
 }

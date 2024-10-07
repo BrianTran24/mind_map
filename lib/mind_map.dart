@@ -15,7 +15,7 @@ class MindMap extends MultiChildRenderObjectWidget {
       this.padding = const EdgeInsets.only(left: 50, right: 10),
       this.dotRadius = 8,
       this.componentWith = 50,
-      required this.dotPath})
+       this.dotPath })
       : super(key: key, children: children);
 
   final Color dotColor;
@@ -28,11 +28,13 @@ class MindMap extends MultiChildRenderObjectWidget {
 
   final double componentWith;
 
-  final Path dotPath;
+  final Path? dotPath;
 
   @override
-  RenderObject createRenderObject(BuildContext context) =>
-      RenderBranchComponent(dotColor, lineColor, padding, dotRadius, componentWith, dotPath);
+  RenderObject createRenderObject(BuildContext context) {
+    var _dotPath = dotPath?? Path()..addOval(Rect.fromCircle(center: Offset.zero, radius: 8));
+    return RenderBranchComponent(dotColor, lineColor, padding, dotRadius, componentWith, _dotPath);
+  }
 
   @override
   void updateRenderObject(BuildContext context, covariant RenderObject renderObject) {
@@ -40,7 +42,9 @@ class MindMap extends MultiChildRenderObjectWidget {
     renderObject.lineColor = lineColor;
     renderObject.padding = padding;
     renderObject.dotRadius = dotRadius;
-    renderObject.dotPath = dotPath;
+    if(dotPath != null) {
+      renderObject.dotPath = dotPath!;
+    }
   }
 }
 
